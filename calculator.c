@@ -2,75 +2,93 @@
 #include <string.h>
 #include <ctype.h>
 
-int main() {
-    char input[100];
-    double num1, num2, result;
-    char operation;
-    int i, j;
+double evaluate(char* input, int start, int end) {
+    double num = 0, result = 0;
+    char operation = '+';
 
-    while (1) {
-        printf("Enter calculation (e.g. 1+2-3*4/5): ");
-        scanf_s("%s", input);
+    for (int i = start; i < end; i++) {
+        if (input[i] == ' ' || isspace(input[i])) {
+            continue; // skip whitespace characters
+        }
+        if (input[i] == '(') {
+            int j = i + 1, depth = 1;
+            while (depth > 0 && j < end) {
+                if (input[j] == '(') depth++;
+                else if (input[j] == ')') depth--;
+                j++;
+            }
+            double subresult = evaluate(input, i + 1, j - 1);
+            if (operation == '*') {
+                result *= subresult;
+            }
+            else if (operation == '/') {
+                if (subresult == 0) {
+                    printf("Cannot divide by zero.\n");
+                    return 0;
+                }
+                result /= subresult;
+            }
+            else if (operation == '+') {
+                result += subresult;
+            }
+            else if (operation == '-') {
+                result -= subresult;
+            }
+            i = j - 1;
+            num = 0;
+        }
+        else if (isdigit(input[i])) {
+            num = num * 10 + (input[i] - '0');
+        }
+        else {
+            if (operation == '*') {
+                result *= num;
+            }
+            else if (operation == '/') {
+                if (num == 0) {
+                    printf("Cannot divide by zero.\n");
+                    return 0;
+                }
+                result /= num;
+            }
+            else if (operation == '+') {
+                result += num;
+            }
+            else if (operation == '-') {
+                result -= num;
+            }
 
-        num1 = 0;
-        num2 = 0;
-        result = 0;
-        operation = '+';
-
-        for (i = 0; i < strlen(input); i++) {
-            if (isdigit(input[i])) {
-                if (operation == '+' || operation == '-' || operation == '*' || operation == '/') {
-                    num1 = num1 * 10 + (input[i] - '0');
-                }
-                else {
-                    num2 = num2 * 10 + (input[i] - '0');
-                }
-            }
-            else if (input[i] == '+' || input[i] == '-' || input[i] == '*' || input[i] == '/') {
-                if (operation == '+') {
-                    result += num1;
-                }
-                else if (operation == '-') {
-                    result -= num1;
-                }
-                else if (operation == '*') {
-                    result *= num1;
-                }
-                else if (operation == '/') {
-                    if (num1 == 0) {
-                        printf("Cannot divide by zero.\n");
-                        goto end;
-                    }
-                    else {
-                        result /= num1;
-                    }
-                }
-                num1 = num2;
-                num2 = 0;
-                operation = input[i];
-            }
+            operation = input[i];
+            num = 0;
         }
-        if (operation == '+') {
-            result += num1;
-        }
-        else if (operation == '-') {
-            result -= num1;
-        }
-        else if (operation == '*') {
-            result *= num1;
-        }
-        else if (operation == '/') {
-            if (num1 == 0) {
-                printf("Cannot divide by zero.\n");
-                goto end;
-            }
-            else {
-                result /= num1;
-            }
-        }
-        printf("Result: %.2lf\n", result);
-        end:;
     }
 
-    return 0;
+    if (operation == '*') {
+        result *= num;
+    }
+    else if (operation == '/') {
+        if (num == 0) {
+            printf("Cannot divide by zero.\n");
+            return 0;
+        }
+        result /= num;
+    }
+    else if (operation == '+') {
+        result += num;
+    }
+    else if (operation == '-') {
+        result -= num;
+    }
+
+    return result;
+}
+
+void calc() {
+    char input[100];
+
+    printf("Enter calculation (e.g. 1+2-3*4/5): ");
+    fgets(input, sizeof(input), stdin); // read input using fgets
+
+    double result = evaluate(input, 0, strlen(input));
+    printf("Result: %.2lf\n", result);
 }
