@@ -1,3 +1,12 @@
+# Calculator
+This script evaluates arithmetic expressions according to the standard mathematical rules. It employs the PEMDAS rule to determine the order of evaluation of different parts of an expression.
+
+The script begins by evaluating any expressions enclosed within parentheses. It then performs multiplications and divisions from left to right, and finally performs additions and subtractions from left to right.
+
+To avoid division by zero, the script checks if the divisor is zero and returns an error message if it is.
+
+In summary, this script correctly evaluates valid arithmetic expressions, following the standard mathematical rules.
+
 # License
 
 C-calculator-script is licensed under the MIT License
